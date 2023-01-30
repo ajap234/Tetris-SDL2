@@ -286,6 +286,29 @@ void Tetromino::displayTetromino(SDL_Renderer* renderer)
         }
 }
 
+void Tetromino::castTetrominoShadow(Grid& grid, SDL_Renderer* renderer) {
+    SDL_Rect shadowRect = { m_xBlock, m_yBlock, m_wBlock, m_hBlock };
+
+    while (!(checkTetrominoGridCollision(m_originDimensions, shadowRect.x, shadowRect.y, IDLE, DOWN, NOROTATE)) &&
+           !(checkTetrominoTetrominoCollision(grid, tetrominos[m_tetromino][m_rotation], shadowRect.x, shadowRect.y + DOWN))) {
+        ++shadowRect.y;
+    }
+    
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0x30);
+    SDL_Rect block = { 0, 0, blockSize, blockSize };
+
+    int tmpPattern = tetrominos[m_tetromino][m_rotation];
+    for (int i = 0; i < maxSize; i++) {
+        for (int j = 0; j < maxSize; j++) {
+            if (tmpPattern & (0x8000 >> (i * maxSize + j))) {
+                block.x = (shadowRect.x + j) * blockSize;
+                block.y = (shadowRect.y + i) * blockSize;
+                SDL_RenderFillRect(renderer, &block);
+            }
+        }
+    }
+}
+
 int Tetromino::getRandomNumber()
 {
     std::random_device random;

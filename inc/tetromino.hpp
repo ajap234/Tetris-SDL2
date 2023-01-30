@@ -70,6 +70,7 @@ class Tetromino
                 void rotateRight(Grid& grid);
                 void updateTetromino();
                 void displayTetromino(SDL_Renderer* renderer);
+                void castTetrominoShadow(Grid& grid, SDL_Renderer* renderer);
                 void resetFallingThreshold();
                 
         private:

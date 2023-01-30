@@ -292,6 +292,7 @@ void Game::draw()
     
 	m_grid.displayGrid(m_renderer, m_tetromino);
 	m_tetromino.displayTetromino(m_renderer);
+	m_tetromino.castTetrominoShadow(m_grid, m_renderer);
     
 	TTF_CloseFont(m_gameFont);
 	m_gameFont = TTF_OpenFont("assets/fonts/retro.ttf", blockSize * 2 / 3);
