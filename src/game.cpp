@@ -89,7 +89,7 @@ bool Game::init()
 	}
 	SDL_Log("SDL 2 sound library initialized with success.\n");
 	
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) < 0)
+	if (Mix_OpenAudio(96000, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) < 0)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error while opening audio channels : %s\n", Mix_GetError());
 		return INIT_FAILURE;
@@ -112,7 +112,7 @@ bool Game::init()
 	}
 	SDL_Log("Renderer created with success.\n");
 
-	SDL_Surface* backgroundSurface = IMG_Load("assets/images/space.png");
+	SDL_Surface* backgroundSurface = IMG_Load("assets/space.png");
 	if (!backgroundSurface)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error while creating grid background surface : %s\n", SDL_GetError());
@@ -130,7 +130,7 @@ bool Game::init()
 	SDL_FreeSurface(backgroundSurface);
 	SDL_Log("Grid background texture created with success. Freeing the grid background surface...\n");
 
-	SDL_RWops* musicFile = SDL_RWFromFile("assets/musics/tetris.ogg", "r");
+	SDL_RWops* musicFile = SDL_RWFromFile("assets/tetris.ogg", "r");
 	if (!musicFile)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error while accessing the music file : %s\n", SDL_GetError());
@@ -295,7 +295,7 @@ void Game::draw()
 	m_tetromino.castTetrominoShadow(m_grid, m_renderer);
     
 	TTF_CloseFont(m_gameFont);
-	m_gameFont = TTF_OpenFont("assets/fonts/retro.ttf", blockSize * 2 / 3);
+	m_gameFont = TTF_OpenFont("assets/retro.ttf", blockSize * 2 / 3);
 	if (!m_gameFont) SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create font : %s\n", SDL_GetError());
     
 	if (m_gameOver)
@@ -340,7 +340,7 @@ void Game::draw()
 	{
 		std::stringstream gameOver;
 		TTF_CloseFont(m_gameFont);
-		m_gameFont = TTF_OpenFont("assets/fonts/retro.ttf", 2 * blockSize);
+		m_gameFont = TTF_OpenFont("assets/retro.ttf", 2 * blockSize);
 		if (!m_gameFont) SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create font : %s\n", SDL_GetError());
 		gameOver << "Game Over";
 		SDL_Color gameOverFadeColor = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -360,7 +360,7 @@ void Game::draw()
 	
 		std::stringstream pressSpace;
 		TTF_CloseFont(m_gameFont);
-		m_gameFont = TTF_OpenFont("assets/fonts/retro.ttf", 2 * blockSize / 3);
+		m_gameFont = TTF_OpenFont("assets/retro.ttf", 2 * blockSize / 3);
 		if (!m_gameFont) SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create font : %s\n", SDL_GetError());
 		pressSpace << "Press \"Space\" to retry...";
 		SDL_Surface* pressSpaceDisplay = TTF_RenderText_Solid(m_gameFont, pressSpace.str().c_str(), gameOverFadeColor);
