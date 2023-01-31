@@ -267,11 +267,12 @@ void Game::update()
 				newLines++;
 			}
 		}
-    
 
-		if (m_linesCount > 0 && /*(m_linesCount % 2) + newLines >= 2 &&*/ m_tetromino.getFallingThreshold() > 50)
+		// TO DO : check the second condition which is false
+		if (m_linesCount > 0 && (m_linesCount % 10) + newLines >= 0 && m_tetromino.getFallingThreshold() > 50)
 		{
 			m_tetromino.reduceUnlatchThreshold();
+			std::cout << "Current falling threshold : " << m_tetromino.getFallingThreshold() << std::endl;
 		}
 	
 		m_linesCount += newLines;
