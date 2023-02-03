@@ -27,6 +27,7 @@ class Game : public SDLApp
 	private:
 		bool m_gameOver = false;
 		bool m_playAgain = false;
+		bool m_restart = false;
 		bool m_isPaused = false;
 		TTF_Font* m_gameFont = nullptr;
 		SDL_Texture* m_lineCounterTextTexture = nullptr;

@@ -14,7 +14,7 @@ constexpr int IDLE = 0;
 enum XDIRECTION {LEFT = -1, RIGHT = 1};
 enum YDIRECTION {UP = -1, DOWN = 1};
 enum ROTATION : bool {NOROTATE, ROTATE};
-constexpr Uint32 defaultFallingThreshold = 200;
+constexpr Uint32 defaultFallingThreshold = 2500;
 constexpr Uint32 timeReductionByLevel = 100;
 
 constexpr std::array<std::array<unsigned const, rotationsNumber>, tetrominosNumber> tetrominos = {

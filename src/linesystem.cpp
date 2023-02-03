@@ -3,11 +3,12 @@
 
 unsigned checkLineCompletion(Grid& grid)
 {    
+    auto& tmpGrid = grid.getGrid();
     unsigned completedLines = 0;
     
     for (int line = linesNumber - 1; line >= 0; line--)
     {
-        if ((grid.getGrid()[line] & fullLine) == fullLine)
+        if ((tmpGrid[line] & fullLine) == fullLine)
         {
             completedLines |= (1 << line);
         }
@@ -18,6 +19,8 @@ unsigned checkLineCompletion(Grid& grid)
 
 void vanishLines(Grid& grid, unsigned const& completedLines)
 {
+    auto& tmpGrid = grid.getGrid();
+    auto& tmpColorLookup = grid.getColorLookup();
     if (completedLines == 0)
     {
         return;
@@ -27,39 +30,41 @@ void vanishLines(Grid& grid, unsigned const& completedLines)
     {
         if ((int) (completedLines & (1 << line)) == (int) (1 << line))
         {
-            grid.getGrid()[line] = 0;
+            tmpGrid[line] = 0;
             
-            for (auto& color : grid.getColorLookup()[line])
+            for (auto& color : tmpColorLookup[line])
             {
-		color = blankBlock;
-	    }
+		        color = blankBlock;
+	        }
         }
     }
 }
 
 void dropLines(Grid& grid, unsigned const& vanishedLines)
 {
+    auto& tmpGrid = grid.getGrid();
+    auto& tmpColorLookup = grid.getColorLookup();
     for (int line = 0; line < linesNumber; line++)
     {		
-	if ((vanishedLines << ((linesNumber - 1) - line)) & (1 << (linesNumber - 1)))
-	{
-	    for (int i = line; i >= 0; i--)
-	    {				
-		if(i == 0)
-		{
-		    grid.getGrid()[i] = 0;
-		    for (int& color : grid.getColorLookup()[i])
-		    {
-			color = blankBlock;
-		    }
-		}
+	    if ((vanishedLines << ((linesNumber - 1) - line)) & (1 << (linesNumber - 1)))
+	    {
+	        for (int i = line; i >= 0; i--)
+	        {				
+	    	    if(i == 0)
+	    	    {
+		            tmpGrid[i] = 0;
+	    	        for (int& color : tmpColorLookup[i])
+		            {
+		           	    color = blankBlock;
+		            }
+		        }
 				
-		else
-		{
-		    grid.getGrid()[i] = grid.getGrid()[i - 1];
-		    grid.getColorLookup()[i] = grid.getColorLookup()[i - 1];
-		}
+		        else
+		        {
+		            tmpGrid[i] = tmpGrid[i - 1];
+		            tmpColorLookup[i] = tmpColorLookup[i - 1];
+		        }
+	        }
 	    }
-	}
     }
 }

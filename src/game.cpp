@@ -89,7 +89,7 @@ bool Game::init()
 	}
 	SDL_Log("SDL 2 sound library initialized with success.\n");
 	
-	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096) < 0)
+	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) < 0)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error while opening audio channels : %s\n", Mix_GetError());
 		return INIT_FAILURE;
@@ -112,7 +112,7 @@ bool Game::init()
 	}
 	SDL_Log("Renderer created with success.\n");
 
-	m_backgroundSurface = IMG_Load("./assets/space.png");
+	m_backgroundSurface = IMG_Load("assets/space.png");
 	if (!m_backgroundSurface)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error while creating grid background surface : %s\n", SDL_GetError());
@@ -130,22 +130,14 @@ bool Game::init()
 
 	SDL_FreeSurface(m_backgroundSurface);
 
-	SDL_RWops* musicFile = SDL_RWFromFile("assets/tetris.ogg", "r");
-	if (!musicFile)
-	{
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error while accessing the music file : %s\n", SDL_GetError());
-		return INIT_FAILURE;
-	}
-	SDL_Log("Music file opened with success.\n");
-
-	m_music = Mix_LoadMUS_RW(musicFile, 1);
+	m_music = Mix_LoadMUS("assets/tetris.ogg");
 	if (!m_music)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error while loading the music : %s\n", SDL_GetError());
 		return INIT_FAILURE;
 	}
 	SDL_Log("Music loaded with success.\n");
-    
+
 	m_running = true;
     
 	return INIT_SUCCESS;
@@ -161,8 +153,10 @@ void Game::run()
 		update();
 		draw();
 		m_endTick = SDL_GetTicks();
-		m_deltaTime = m_beginTick - m_endTick;
-		SDL_Delay((Uint32)(m_framerate / 1000 - m_deltaTime));
+		m_deltaTime = m_endTick - m_beginTick;
+		if (m_deltaTime < m_framerate / 1000) {
+			SDL_Delay((Uint32)(m_framerate / 1000 - m_deltaTime));
+		}
 	}
 	Mix_FadeOutMusic(1500);
 }
@@ -212,6 +206,11 @@ void Game::handleEvents()
 			m_playAgain = true;
 		}
 
+		if (m_keyboard[SDL_SCANCODE_R] && m_isPaused)
+		{
+			m_restart = true;
+		}
+
 		if (m_keyboard[SDL_SCANCODE_ESCAPE])
 		{
 			pauseGame();
@@ -221,7 +220,7 @@ void Game::handleEvents()
 
 void Game::update()
 {
-	if (m_gameOver && m_playAgain)
+	if ((m_gameOver && m_playAgain) || m_restart)
 	{
 		m_grid = Grid();
 		m_linesCount = 0;
@@ -230,6 +229,8 @@ void Game::update()
 		m_tetromino.setBlockedState(false);
 		m_playAgain = false;
 		m_gameOver = false;
+		m_restart = false;
+		m_isPaused = false;
 	}
 
 	m_tetromino.updateTetromino();

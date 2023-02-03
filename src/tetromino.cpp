@@ -311,9 +311,9 @@ void Tetromino::castTetrominoShadow(Grid& grid, SDL_Renderer* renderer) {
 
 int Tetromino::getRandomNumber()
 {
-    std::random_device random;
-    std::default_random_engine engine(random());
-    std::uniform_int_distribution<int> uniform(0,6);
+    static std::random_device random;
+    static std::default_random_engine engine(random());
+    static std::uniform_int_distribution<int> uniform(0,6);
     return uniform(engine);
 }
 
