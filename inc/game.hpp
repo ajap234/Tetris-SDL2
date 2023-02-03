@@ -1,11 +1,6 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <SDL_mixer.h>
-
 #include "sdlapp.hpp"
 #include "grid.hpp"
 #include "tetromino.hpp"
@@ -14,11 +9,14 @@ class Game : public SDLApp
 {
 	public:
 		Game();
+		Game(Game& game) = delete;
 		virtual ~Game();
 		
 	public:
 		bool init() override;
 		void run() override;
+
+		void operator=(Game const& game) = delete;
 		
 	private:
 		void handleEvents();
@@ -36,6 +34,7 @@ class Game : public SDLApp
 		SDL_Texture* m_gameOverTextTexture = nullptr;
 		SDL_Texture* m_pressSpaceTextTexture = nullptr;
 		Grid m_grid = {};
+		SDL_Surface* m_backgroundSurface = nullptr;
 		SDL_Texture* m_gridBackground = nullptr;
 		Tetromino m_tetromino = {};
 		Mix_Music* m_music = nullptr;

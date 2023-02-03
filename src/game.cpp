@@ -112,25 +112,24 @@ bool Game::init()
 	}
 	SDL_Log("Renderer created with success.\n");
 
-	SDL_Surface* backgroundSurface = IMG_Load("assets/space.png");
-	if (!backgroundSurface)
+	m_backgroundSurface = IMG_Load("./assets/space.png");
+	if (!m_backgroundSurface)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error while creating grid background surface : %s\n", SDL_GetError());
 		return INIT_FAILURE;
 	}
 	SDL_Log("Grid background surface created with success\n");
 
-	m_gridBackground = SDL_CreateTextureFromSurface(m_renderer, backgroundSurface);
+	m_gridBackground = SDL_CreateTextureFromSurface(m_renderer, m_backgroundSurface);
 	if (!m_gridBackground)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error while creating grid background texture : %s\n", SDL_GetError());
 		return INIT_FAILURE;
 	}
-
-	SDL_FreeSurface(backgroundSurface);
 	SDL_Log("Grid background texture created with success. Freeing the grid background surface...\n");
+	SDL_FreeSurface(m_backgroundSurface);
 
-	SDL_RWops* musicFile = SDL_RWFromFile("assets/tetris.ogg", "r");
+	SDL_RWops* musicFile = SDL_RWFromFile("./assets/tetris.ogg", "r");
 	if (!musicFile)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error while accessing the music file : %s\n", SDL_GetError());
@@ -156,13 +155,13 @@ void Game::run()
 	Mix_PlayMusic(m_music, -1);
 	while (m_running)
 	{
-		m_beginTick = SDL_GetTicks();
+		// dm_beginTick = SDL_GetTicks();
 		handleEvents();
 		update();
 		draw();
-		m_endTick = SDL_GetTicks();
-		m_deltaTime = m_beginTick - m_endTick;
-		SDL_Delay((Uint32)(m_framerate / 1000 - m_deltaTime));
+		// m_endTick = SDL_GetTicks();
+		// m_deltaTime = m_beginTick - m_endTick;
+		// SDL_Delay((Uint32)(m_framerate / 1000 - m_deltaTime));
 	}
 	Mix_HaltMusic();
 }
@@ -269,7 +268,7 @@ void Game::update()
 		}
 
 		// TO DO : check the second condition which is false
-		if (m_linesCount > 0 && (m_linesCount % 10) + newLines >= 0 && m_tetromino.getFallingThreshold() > 50)
+		if (m_linesCount > 0 && static_cast<int>((m_linesCount + newLines) / 10) > static_cast<int>(m_linesCount / 10) && m_tetromino.getFallingThreshold() > 50)
 		{
 			m_tetromino.reduceUnlatchThreshold();
 			std::cout << "Current falling threshold : " << m_tetromino.getFallingThreshold() << std::endl;
@@ -292,8 +291,8 @@ void Game::draw()
 	SDL_SetRenderDrawColor(m_renderer, 0x00, 0x00, 0x00, 0x7F);
     
 	m_grid.displayGrid(m_renderer, m_tetromino);
-	m_tetromino.displayTetromino(m_renderer);
 	m_tetromino.castTetrominoShadow(m_grid, m_renderer);
+	m_tetromino.displayTetromino(m_renderer);
     
 	TTF_CloseFont(m_gameFont);
 	m_gameFont = TTF_OpenFont("assets/retro.ttf", blockSize * 2 / 3);
