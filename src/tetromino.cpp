@@ -321,3 +321,7 @@ void Tetromino::resetFallingThreshold()
 {
     m_fallingThreshold = defaultFallingThreshold;
 }
+
+bool Tetromino::isMaxLevel() const {
+    return m_fallingThreshold <= timeReductionByLevel;
+}

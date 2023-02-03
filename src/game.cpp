@@ -89,7 +89,7 @@ bool Game::init()
 	}
 	SDL_Log("SDL 2 sound library initialized with success.\n");
 	
-	if (Mix_OpenAudio(96000, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) < 0)
+	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096) < 0)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error while opening audio channels : %s\n", Mix_GetError());
 		return INIT_FAILURE;
@@ -127,9 +127,10 @@ bool Game::init()
 		return INIT_FAILURE;
 	}
 	SDL_Log("Grid background texture created with success. Freeing the grid background surface...\n");
+
 	SDL_FreeSurface(m_backgroundSurface);
 
-	SDL_RWops* musicFile = SDL_RWFromFile("./assets/tetris.ogg", "r");
+	SDL_RWops* musicFile = SDL_RWFromFile("assets/tetris.ogg", "r");
 	if (!musicFile)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error while accessing the music file : %s\n", SDL_GetError());
@@ -137,7 +138,7 @@ bool Game::init()
 	}
 	SDL_Log("Music file opened with success.\n");
 
-	m_music = Mix_LoadMUS_RW(musicFile, 0);
+	m_music = Mix_LoadMUS_RW(musicFile, 1);
 	if (!m_music)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error while loading the music : %s\n", SDL_GetError());
@@ -152,18 +153,18 @@ bool Game::init()
 
 void Game::run()
 {
-	Mix_PlayMusic(m_music, -1);
+	Mix_FadeInMusic(m_music, -1, 1500);
 	while (m_running)
 	{
-		// dm_beginTick = SDL_GetTicks();
+		m_beginTick = SDL_GetTicks();
 		handleEvents();
 		update();
 		draw();
-		// m_endTick = SDL_GetTicks();
-		// m_deltaTime = m_beginTick - m_endTick;
-		// SDL_Delay((Uint32)(m_framerate / 1000 - m_deltaTime));
+		m_endTick = SDL_GetTicks();
+		m_deltaTime = m_beginTick - m_endTick;
+		SDL_Delay((Uint32)(m_framerate / 1000 - m_deltaTime));
 	}
-	Mix_HaltMusic();
+	Mix_FadeOutMusic(1500);
 }
 
 void Game::handleEvents()
@@ -267,8 +268,7 @@ void Game::update()
 			}
 		}
 
-		// TO DO : check the second condition which is false
-		if (m_linesCount > 0 && static_cast<int>((m_linesCount + newLines) / 10) > static_cast<int>(m_linesCount / 10) && m_tetromino.getFallingThreshold() > 50)
+		if (m_linesCount > 0 && static_cast<int>((m_linesCount + newLines) / 10) > static_cast<int>(m_linesCount / 10) && !m_tetromino.isMaxLevel())
 		{
 			m_tetromino.reduceUnlatchThreshold();
 			std::cout << "Current falling threshold : " << m_tetromino.getFallingThreshold() << std::endl;
@@ -321,7 +321,7 @@ void Game::draw()
 	SDL_DestroyTexture(m_lineCounterTextTexture);
 
 	std::stringstream levels;
-	levels << "Level : " << (m_linesCount / 10) + 1;
+	levels << "Level : " << ((defaultFallingThreshold - m_tetromino.getFallingThreshold()) / 100) + 1 /*(m_linesCount / 10) + 1*/;
 	SDL_Color levelsColor = {0xFF, 0xFF, 0xFF, 0xFF};
 	SDL_Surface* levelsCounter = TTF_RenderText_Solid(m_gameFont, levels.str().c_str(), levelsColor);
 	if (!levelsCounter) SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create levelCounter text surface : %s\n", SDL_GetError());
@@ -387,7 +387,7 @@ void Game::pauseGame()
 	m_tetromino.setBlockedState(m_isPaused);
 }
 
-Uint32 Game::m_framerate = 120;
+Uint32 Game::m_framerate = 60;
 Uint32 Game::m_beginTick = 0;
 Uint32 Game::m_endTick = 0;
 Uint32 Game::m_deltaTime = 0;
