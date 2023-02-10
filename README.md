@@ -7,5 +7,5 @@ E : rotate right
 left arrow : move left  
 right arrow : move right  
 up arrow : instant placement   
-escape : pause
+escape : pause  
 R (while in pause) : restart
